@@ -1,7 +1,7 @@
 {
-  "name": "RadiaCode 101 sensor component",
+  "name": "RadiaCode 101",
   "hacs": "1.6.0",
-  "domains": ["binary_sensor", "sensor", "switch"],
-  "iot_class": "Cloud Polling",
-  "homeassistant": "0.118.0"
+  "domains": ["sensor"],
+  "iot_class": "Local Polling",
+  "homeassistant": "2021.11.0"
 }
