@@ -41,6 +41,7 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="user", data_schema=schema)
 
         method = user_input[CONF_METHOD]
+        _logger.debug(f"selected method: {method}")
         if method == CONF_METHOD_SCAN:
             return await self.async_step_scan()
         else:
@@ -54,19 +55,20 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is None:
             return self.async_show_form(step_id="scan")
 
+        _logger.debug("Starting a scan for RadiaCode devices...")
         try:
             devices = await self.hass.async_add_executor_job(discover_devices)
         except BTLEDisconnectError:
-            _logger.exception("Connection error")
+            _logger.exception("BLE Connection error")
             errors['base'] = 'btle_disconnection'
             return self.async_show_form(step_id="scan", errors=errors)
         except BTLEManagementError:
-            _logger.exception("Management error")
+            _logger.exception("BLE Management error")
             errors['base'] = 'btle_management'
             return self.async_show_form(step_id="scan", errors=errors)
 
         if not devices:
-            return self.async_abort('not_found')
+            return self.async_abort(reason='not_found')
 
         self.devices = devices
         return await self.async_step_device()

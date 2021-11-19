@@ -10,7 +10,7 @@
       },
       "scan": {
         "title": "RadiaCode 101",
-        "description": "Make sure the device is on and BLE is on"
+        "description": "Make sure the device is on and BLE is on. Are you ready to start scanning?"
       },
       "device": {
         "title": "RadiaCode 101",
