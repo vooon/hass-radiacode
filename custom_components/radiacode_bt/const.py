@@ -1,4 +1,7 @@
 """Constants for RadiaCode 101 sensor component."""
+
+import typing
+
 # Base component constants
 NAME = "RadiaCode 101"
 DOMAIN = "radiacode_bt"
@@ -18,11 +21,17 @@ BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 
 # Platforms
 SENSOR = "sensor"
-PLATFORMS = [SENSOR, ]
+PLATFORMS = [
+    SENSOR,
+]
+
+# Config entries
+CONF_METHOD: typing.Final = "method"
+CONF_METHOD_SCAN = "Scan"
+CONF_METHOD_MANUAL = "Manual"
 
 # Defaults
 DEFAULT_NAME = DOMAIN
-
 
 STARTUP_MESSAGE = f"""
 -------------------------------------------------------------------

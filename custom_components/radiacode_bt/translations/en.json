@@ -3,17 +3,32 @@
     "step": {
       "user": {
         "title": "RadiaCode 101",
-        "description": "If you need help with the configuration have a look here: https://github.com/vooon/hass-radiacode",
+        "description": "Obtain radiation data from RadiaCode 101 via bluetooth. Select scan or enter MAC.",
         "data": {
-          "name": "Name",
-          "mac": "BT MAC"
+          "method": "Method used:"
+        }
+      },
+      "scan": {
+        "title": "RadiaCode 101",
+        "description": "Make sure the device is on and BLE is on"
+      },
+      "device": {
+        "title": "RadiaCode 101",
+        "description": "Enter a name for the device and MAC address.",
+        "data": {
+          "name": "Device Name",
+          "mac": "MAC address"
         }
       }
     },
     "error": {
-      "not_found": "Device is not found."
+      "exception": "General exception",
+      "btle_disconnect": "Bluetooth connection error happened during scan.",
+      "btle_management": "Could not start bluetooth scan."
     },
     "abort": {
+      "exists": "This mac already configured.",
+      "not_found": "No devices found."
     }
   }
 }
