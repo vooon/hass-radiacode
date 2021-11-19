@@ -100,5 +100,5 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="device",
                                         errors={'base': 'exception'})
 
-        return self.aynsc_create_entry(title=user_input[CONF_NAME],
+        return self.async_create_entry(title=user_input[CONF_NAME],
                                        data=user_input)

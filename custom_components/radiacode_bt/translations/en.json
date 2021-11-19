@@ -27,7 +27,7 @@
       "btle_management": "Could not start bluetooth scan."
     },
     "abort": {
-      "exists": "This mac already configured.",
+      "already_configured": "This MAC already configured.",
       "not_found": "No devices found."
     }
   }
