@@ -1,12 +1,14 @@
 """Constants for RadiaCode 101 sensor component."""
 # Base component constants
-NAME = "RadiaCode 101 sensor component"
+NAME = "RadiaCode 101"
 DOMAIN = "radiacode_bt"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.0.0"
+VERSION = "0.0.1"
 
 ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
 ISSUE_URL = "https://github.com/vooon/hass-radiacode/issues"
+
+MANUFACTURER = "https://scan-electronics.com/"
 
 # Icons
 ICON = "mdi:format-quote-close"
@@ -15,16 +17,8 @@ ICON = "mdi:format-quote-close"
 BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 
 # Platforms
-BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
-SWITCH = "switch"
-PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
-
-
-# Configuration and options
-CONF_ENABLED = "enabled"
-CONF_USERNAME = "username"
-CONF_PASSWORD = "password"
+PLATFORMS = [SENSOR, ]
 
 # Defaults
 DEFAULT_NAME = DOMAIN

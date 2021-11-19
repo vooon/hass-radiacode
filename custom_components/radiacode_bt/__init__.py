@@ -5,23 +5,17 @@ For more details about this integration, please refer to
 https://github.com/vooon/hass-radiacode
 """
 import asyncio
-import logging
 from datetime import timedelta
+import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import Config
-from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_MAC
+from homeassistant.core import Config, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.update_coordinator import UpdateFailed
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from radiacode import RadiaCode
 
-from .api import RadiacodeBtApiClient
-from .const import CONF_PASSWORD
-from .const import CONF_USERNAME
-from .const import DOMAIN
-from .const import PLATFORMS
-from .const import STARTUP_MESSAGE
+from .const import DOMAIN, PLATFORMS, STARTUP_MESSAGE
 
 SCAN_INTERVAL = timedelta(seconds=30)
 
@@ -39,11 +33,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
 
-    username = entry.data.get(CONF_USERNAME)
-    password = entry.data.get(CONF_PASSWORD)
+    btmac = entry.data.get(CONF_MAC)
 
-    session = async_get_clientsession(hass)
-    client = RadiacodeBtApiClient(username, password, session)
+    client = RadiaCode(bluetooth_mac=btmac)
 
     coordinator = RadiacodeBtDataUpdateCoordinator(hass, client=client)
     await coordinator.async_refresh()
@@ -54,11 +46,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
     for platform in PLATFORMS:
-        if entry.options.get(platform, True):
-            coordinator.platforms.append(platform)
-            hass.async_add_job(
-                hass.config_entries.async_forward_entry_setup(entry, platform)
-            )
+        coordinator.platforms.append(platform)
+        hass.async_add_job(
+            hass.config_entries.async_forward_entry_setup(entry, platform))
 
     entry.add_update_listener(async_reload_entry)
     return True
@@ -66,17 +56,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
-
     def __init__(
         self,
         hass: HomeAssistant,
-        client: RadiacodeBtApiClient,
+        client: RadiaCode,
     ) -> None:
         """Initialize."""
         self.api = client
         self.platforms = []
 
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
+        super().__init__(hass,
+                         _LOGGER,
+                         name=DOMAIN,
+                         update_interval=SCAN_INTERVAL)
 
     async def _async_update_data(self):
         """Update data via library."""
@@ -89,15 +81,10 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle removal of an entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    unloaded = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, platform)
-                for platform in PLATFORMS
-                if platform in coordinator.platforms
-            ]
-        )
-    )
+    unloaded = all(await asyncio.gather(*[
+        hass.config_entries.async_forward_entry_unload(entry, platform)
+        for platform in PLATFORMS if platform in coordinator.platforms
+    ]))
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id)
 

@@ -1,10 +1,10 @@
 {
   "domain": "radiacode_bt",
-  "name": "RadiaCode 101 sensor component",
+  "name": "RadiaCode 101",
   "documentation": "https://github.com/vooon/hass-radiacode",
   "issue_tracker": "https://github.com/vooon/hass-radiacode/issues",
   "dependencies": [],
   "config_flow": true,
   "codeowners": ["@vooon"],
-  "requirements": []
+  "requirements": ["radiacode>=0.1.4"]
 }
