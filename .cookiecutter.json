@@ -1,0 +1,10 @@
+{
+  "_template": "gh:oncleben31/cookiecutter-homeassistant-custom-component",
+  "class_name_prefix": "RadiacodeBt",
+  "domain_name": "radiacode_bt",
+  "friendly_name": "RadiaCode 101 sensor component",
+  "github_user": "vooon",
+  "project_name": "hass-radiacode",
+  "test_suite": "yes",
+  "version": "0.0.0"
+}
