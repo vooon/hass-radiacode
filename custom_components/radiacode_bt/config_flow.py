@@ -84,11 +84,11 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_NAME): str,
                 vol.Required(CONF_MAC): schema_mac,
             })
-            return self.async_show_form(step_id='user', data_schema=schema)
+            return self.async_show_form(step_id='device', data_schema=schema)
 
         mac = user_input[CONF_MAC] = user_input[CONF_MAC].strip()
         unique_id = device_registry.format_mac(mac)
-        _logger.info(f"RadiaCode MAC: {mac}, unique_id: {unique_id}")
+        _logger.info(f"Setting up RadiaCode MAC: {mac}, unique_id: {unique_id}")
 
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
@@ -97,7 +97,7 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             BTPeriph(mac)
         except Exception:
             _logger.exception("Failed to connect to the device.")
-            return self.async_show_form(step_id="scan",
+            return self.async_show_form(step_id="device",
                                         errors={'base': 'exception'})
 
         return self.aynsc_create_entry(title=user_input[CONF_NAME],

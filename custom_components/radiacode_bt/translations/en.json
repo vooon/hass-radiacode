@@ -9,11 +9,11 @@
         }
       },
       "scan": {
-        "title": "RadiaCode 101",
+        "title": "RadiaCode 101 (scan)",
         "description": "Make sure the device is on and BLE is on. Are you ready to start scanning?"
       },
       "device": {
-        "title": "RadiaCode 101",
+        "title": "RadiaCode 101 (device)",
         "description": "Enter a name for the device and MAC address.",
         "data": {
           "name": "Device Name",
