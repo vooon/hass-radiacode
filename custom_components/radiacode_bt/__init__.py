@@ -107,10 +107,12 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
             return await self._async_get_data_buf()
         except Exception as exception:
             self.api = None
+            _LOGGER.exception("Failed to get data_buf")
             raise UpdateFailed() from exception
 
     async def _async_get_data_buf(self) -> Data:
         if self.api is None:
+            _LOGGER.info(f"Connecting to: {self.mac}")
             self.api = RadiaCode(bluetooth_mac=self.mac)
             self.last_fw_version = self.api.fw_version()
 
