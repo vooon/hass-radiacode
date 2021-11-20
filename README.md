@@ -12,9 +12,9 @@
 
 **This component will set up the following platforms.**
 
-| Platform        | Description                                                               |
-| --------------- | ------------------------------------------------------------------------- |
-| `sensor`        | Show info from RadiaCode 101 Radiation sensor.                            |
+| Platform | Description                                    |
+| -------- | ---------------------------------------------- |
+| `sensor` | Show info from RadiaCode 101 Radiation sensor. |
 
 This integration uses https://github.com/cdump/radiacode library. Kudos to Maxim!
 
