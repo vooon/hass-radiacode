@@ -6,6 +6,8 @@ https://github.com/vooon/hass-radiacode
 """
 import asyncio
 import logging
+import typing
+from dataclasses import dataclass
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
@@ -15,7 +17,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.update_coordinator import UpdateFailed
+from radiacode import DoseRateDB
 from radiacode import RadiaCode
+from radiacode import RareData
 
 from .const import DOMAIN
 from .const import PLATFORMS
@@ -37,11 +41,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
 
-    btmac = entry.data.get(CONF_MAC)
+    mac = entry.data.get(CONF_MAC)
 
-    client = RadiaCode(bluetooth_mac=btmac)
-
-    coordinator = RadiacodeBtDataUpdateCoordinator(hass, client=client)
+    coordinator = RadiacodeBtDataUpdateCoordinator(hass, mac=mac)
     await coordinator.async_refresh()
 
     if not coordinator.last_update_success:
@@ -59,16 +61,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 
+@dataclass
+class Data:
+    dose_rate_db: typing.Optional[DoseRateDB] = None
+    rare_data: typing.Optional[RareData] = None
+
+    @classmethod
+    def from_data_buf(cls, data_buf: typing.List[typing.Any]) -> "Data":
+        dose_rate_db = None
+        rare_data = None
+        for msg in data_buf:
+            if isinstance(msg, DoseRateDB):
+                dose_rate_db = msg
+            elif isinstance(msg, RareData):
+                rare_data = msg
+
+        return cls(dose_rate_db, rare_data)
+
+
 class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
+
+    mac: str = ""
+
+    api: typing.Optional[RadiaCode] = None
+
+    last_dose_rate_db: typing.Optional[DoseRateDB] = None
+    last_rare_data: typing.Optional[RareData] = None
+    last_fw_version: str = "unknown"
 
     def __init__(
         self,
         hass: HomeAssistant,
-        client: RadiaCode,
+        mac: str,
     ) -> None:
         """Initialize."""
-        self.api = client
+        self.mac = mac
         self.platforms = []
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
@@ -76,9 +104,23 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data via library."""
         try:
-            return await self.api.async_get_data()
+            return await self._async_get_data_buf()
         except Exception as exception:
+            self.api = None
             raise UpdateFailed() from exception
+
+    async def _async_get_data_buf(self) -> Data:
+        if self.api is None:
+            self.api = RadiaCode(bluetooth_mac=self.mac)
+            self.last_fw_version = self.api.fw_version()
+
+        data = Data.from_data_buf(self.hass.async_add_executor_job(self.api.data_buf))
+        if data.dose_rate_db:
+            self.last_dose_rate_db = data.dose_rate_db
+        if data.rare_data:
+            self.last_rare_data = data.rare_data
+
+        return data
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

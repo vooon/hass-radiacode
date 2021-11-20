@@ -1,5 +1,4 @@
 """Constants for RadiaCode 101 sensor component."""
-
 import typing
 
 # Base component constants
@@ -8,7 +7,7 @@ DOMAIN = "radiacode_bt"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.1"
 
-ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
+ATTRIBUTION = ""
 ISSUE_URL = "https://github.com/vooon/hass-radiacode/issues"
 
 MANUFACTURER = "https://scan-electronics.com/"
