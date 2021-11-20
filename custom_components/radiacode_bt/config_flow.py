@@ -1,14 +1,19 @@
 """Adds config flow for RadiaCode 101 sensor component."""
 import logging
 
-from bluepy.btle import BTLEDisconnectError, BTLEManagementError
+import voluptuous as vol
+from bluepy.btle import BTLEDisconnectError
+from bluepy.btle import BTLEManagementError
 from homeassistant import config_entries
-from homeassistant.const import CONF_MAC, CONF_NAME
+from homeassistant.const import CONF_MAC
+from homeassistant.const import CONF_NAME
 from homeassistant.helpers import device_registry
 from radiacode.transports.bluetooth import Bluetooth as BTPeriph
-import voluptuous as vol
 
-from .const import CONF_METHOD, CONF_METHOD_MANUAL, CONF_METHOD_SCAN, DOMAIN
+from .const import CONF_METHOD
+from .const import CONF_METHOD_MANUAL
+from .const import CONF_METHOD_SCAN
+from .const import DOMAIN
 from .helper import discover_devices
 
 _logger = logging.getLogger(__name__)
@@ -26,18 +31,23 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @property
     def data_schema(self):
-        return vol.Schema({
-            vol.Required(CONF_NAME): str,
-            vol.Required(CONF_MAC): str,
-        })
+        return vol.Schema(
+            {
+                vol.Required(CONF_NAME): str,
+                vol.Required(CONF_MAC): str,
+            }
+        )
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         if user_input is None:
-            schema = vol.Schema({
-                vol.Required(CONF_METHOD):
-                vol.In((CONF_METHOD_SCAN, CONF_METHOD_MANUAL))
-            })
+            schema = vol.Schema(
+                {
+                    vol.Required(CONF_METHOD): vol.In(
+                        (CONF_METHOD_SCAN, CONF_METHOD_MANUAL)
+                    )
+                }
+            )
             return self.async_show_form(step_id="user", data_schema=schema)
 
         method = user_input[CONF_METHOD]
@@ -60,15 +70,15 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             devices = await self.hass.async_add_executor_job(discover_devices)
         except BTLEDisconnectError:
             _logger.exception("BLE Connection error")
-            errors['base'] = 'btle_disconnection'
+            errors["base"] = "btle_disconnection"
             return self.async_show_form(step_id="scan", errors=errors)
         except BTLEManagementError:
             _logger.exception("BLE Management error")
-            errors['base'] = 'btle_management'
+            errors["base"] = "btle_management"
             return self.async_show_form(step_id="scan", errors=errors)
 
         if not devices:
-            return self.async_abort(reason='not_found')
+            return self.async_abort(reason="not_found")
 
         self.devices = devices
         return await self.async_step_device()
@@ -80,11 +90,13 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             schema_mac = str
             if self.devices:
                 schema_mac = vol.In(self.devices)
-            schema = vol.Schema({
-                vol.Required(CONF_NAME): str,
-                vol.Required(CONF_MAC): schema_mac,
-            })
-            return self.async_show_form(step_id='device', data_schema=schema)
+            schema = vol.Schema(
+                {
+                    vol.Required(CONF_NAME): str,
+                    vol.Required(CONF_MAC): schema_mac,
+                }
+            )
+            return self.async_show_form(step_id="device", data_schema=schema)
 
         mac = user_input[CONF_MAC] = user_input[CONF_MAC].strip()
         unique_id = device_registry.format_mac(mac)
@@ -97,8 +109,6 @@ class RadiacodeBtFlow(config_entries.ConfigFlow, domain=DOMAIN):
             BTPeriph(mac)
         except Exception:
             _logger.exception("Failed to connect to the device.")
-            return self.async_show_form(step_id="device",
-                                        errors={'base': 'exception'})
+            return self.async_show_form(step_id="device", errors={"base": "exception"})
 
-        return self.async_create_entry(title=user_input[CONF_NAME],
-                                       data=user_input)
+        return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
