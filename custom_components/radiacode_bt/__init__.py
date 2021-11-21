@@ -14,6 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_MAC
 from homeassistant.core import Config
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from radiacode import DoseRateDB
@@ -23,8 +24,6 @@ from radiacode import RareData
 from .const import DOMAIN
 from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
-
-# from homeassistant.exceptions import ConfigEntryNotReady
 
 SCAN_INTERVAL = timedelta(seconds=30)
 
@@ -47,8 +46,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     coordinator = RadiacodeBtDataUpdateCoordinator(hass, mac=mac)
     await coordinator.async_refresh()
 
-    # if not coordinator.last_update_success:
-    #     raise ConfigEntryNotReady
+    if not coordinator.last_update_success:
+        raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
