@@ -113,13 +113,17 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_get_data_buf(self) -> Data:
         if self.api is None:
             _LOGGER.info(f"Connecting to: {self.mac}")
-            self.api = self.hass.async_add_executor_job(
+            self.api = await self.hass.async_add_executor_job(
                 lambda: RadiaCode(bluetooth_mac=self.mac)
             )
-            self.last_fw_version = self.hass.async_add_executor_job(self.api.fw_version)
+            self.last_fw_version = await self.hass.async_add_executor_job(
+                self.api.fw_version
+            )
 
         _LOGGER.info(f"Getting data from: {self.mac}")
-        data = Data.from_data_buf(self.hass.async_add_executor_job(self.api.data_buf))
+        data = Data.from_data_buf(
+            await self.hass.async_add_executor_job(self.api.data_buf)
+        )
         if data.dose_rate_db:
             self.last_dose_rate_db = data.dose_rate_db
         if data.rare_data:
