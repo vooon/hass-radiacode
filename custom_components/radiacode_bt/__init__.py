@@ -120,9 +120,11 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
             self.last_fw_version = await self.hass.async_add_executor_job(
                 self.api.fw_version
             )
+            _LOGGER.info(f"firmware: {self.last_fw_version}")
             self.last_serial_number = await self.hass.async_add_executor_job(
                 self.api.serial_number
             )
+            _LOGGER.info(f"serial number: {self.last_serial_number}")
 
         _LOGGER.info(f"Getting data from: {self.mac}")
         data = Data.from_data_buf(
