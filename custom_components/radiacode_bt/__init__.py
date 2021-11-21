@@ -106,31 +106,23 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data via library."""
         try:
-            return await self._async_get_data_buf()
+            return await self.hass.async_add_executor_job(self._get_data)
         except Exception as exception:
             self.api = None
             _LOGGER.exception("Failed to get data_buf")
             raise UpdateFailed() from exception
 
-    async def _async_get_data_buf(self) -> Data:
+    def _get_data(self) -> Data:
         if self.api is None:
             _LOGGER.info(f"Connecting to: {self.mac}")
-            self.api = await self.hass.async_add_executor_job(
-                lambda: RadiaCode(bluetooth_mac=self.mac)
-            )
-            self.last_fw_version = await self.hass.async_add_executor_job(
-                self.api.fw_version
-            )
+            self.api = RadiaCode(bluetooth_mac=self.mac)
+            self.last_fw_version = self.api.fw_version()
             _LOGGER.info(f"firmware: {self.last_fw_version}")
-            self.last_serial_number = await self.hass.async_add_executor_job(
-                self.api.serial_number
-            )
+            # self.last_serial_number = self.api.serial_number()
             _LOGGER.info(f"serial number: {self.last_serial_number}")
 
         _LOGGER.info(f"Getting data from: {self.mac}")
-        data = Data.from_data_buf(
-            await self.hass.async_add_executor_job(self.api.data_buf)
-        )
+        data = Data.from_data_buf(self.api.data_buf())
         if data.dose_rate_db:
             self.last_dose_rate_db = data.dose_rate_db
         if data.rare_data:
