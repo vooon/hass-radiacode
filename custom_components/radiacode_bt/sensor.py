@@ -27,7 +27,7 @@ class RadiacodeBtSensorDoseRate(RadiacodeBtEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        name = self.config_entry.get(CONF_NAME, DEFAULT_NAME)
+        name = self.config_entry.data.get(CONF_NAME, DEFAULT_NAME)
         return f"{name} rate"
 
     @property
@@ -58,7 +58,7 @@ class RadiacodeBtSensorCountRate(RadiacodeBtEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        name = self.config_entry.get(CONF_NAME, DEFAULT_NAME)
+        name = self.config_entry.data.get(CONF_NAME, DEFAULT_NAME)
         return f"{name} count"
 
     @property
