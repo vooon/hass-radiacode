@@ -114,7 +114,7 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
         if self.api is None:
             _LOGGER.info(f"Connecting to: {self.mac}")
             self.api = self.hass.async_add_executor_job(
-                RadiaCode, bluetooth_mac=self.mac
+                lambda: RadiaCode(bluetooth_mac=self.mac)
             )
             self.last_fw_version = self.hass.async_add_executor_job(self.api.fw_version)
 
