@@ -5,7 +5,6 @@ from .const import ATTRIBUTION
 from .const import DOMAIN
 from .const import MANUFACTURER
 from .const import NAME
-from .const import VERSION
 
 
 class RadiacodeBtEntity(CoordinatorEntity):
@@ -21,11 +20,12 @@ class RadiacodeBtEntity(CoordinatorEntity):
     @property
     def device_info(self):
         fw_version = self.coordinator.last_fw_version
+        serial_number = self.coordinator.last_serial_number
 
         return {
             "identifiers": {(DOMAIN, self.unique_id)},
             "name": NAME,
-            "model": VERSION,
+            "model": serial_number,
             "manufacturer": MANUFACTURER,
             "sw_version": fw_version,
         }
@@ -33,8 +33,13 @@ class RadiacodeBtEntity(CoordinatorEntity):
     @property
     def device_state_attributes(self):
         """Return the state attributes."""
+        battery_level = None
+        if self.coordinator.last_rare_data:
+            battery_level = float(self.coordinator.last_rare_data.charge_level)
+
         return {
             "attribution": ATTRIBUTION,
             "id": str(self.coordinator.data.get("id")),
             "integration": DOMAIN,
+            "battery_level": battery_level,
         }

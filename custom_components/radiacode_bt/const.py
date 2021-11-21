@@ -1,5 +1,5 @@
 """Constants for RadiaCode 101 sensor component."""
-import typing
+from typing import Final
 
 # Base component constants
 NAME = "RadiaCode 101"
@@ -13,10 +13,10 @@ ISSUE_URL = "https://github.com/vooon/hass-radiacode/issues"
 MANUFACTURER = "https://scan-electronics.com/"
 
 # Icons
-ICON = "mdi:format-quote-close"
+ICON: Final = "mdi:radioactive"
 
 # Device classes
-BINARY_SENSOR_DEVICE_CLASS = "connectivity"
+SENSOR_DEVICE_CLASS: Final = "radioactivity"
 
 # Platforms
 SENSOR = "sensor"
@@ -24,10 +24,14 @@ PLATFORMS = [
     SENSOR,
 ]
 
+# Units
+MICROSIEVERT_HOUR: Final = "μSv/h"
+COUNT_PER_SECOND: Final = "CPS"
+
 # Config entries
-CONF_METHOD: typing.Final = "method"
-CONF_METHOD_SCAN = "Scan"
-CONF_METHOD_MANUAL = "Manual"
+CONF_METHOD: Final = "method"
+CONF_METHOD_SCAN: Final = "Scan"
+CONF_METHOD_MANUAL: Final = "Manual"
 
 # Defaults
 DEFAULT_NAME = DOMAIN

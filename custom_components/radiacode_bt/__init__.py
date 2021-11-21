@@ -89,6 +89,7 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
     last_dose_rate_db: typing.Optional[DoseRateDB] = None
     last_rare_data: typing.Optional[RareData] = None
     last_fw_version: str = "unknown"
+    last_serial_number: str = "unknown"
 
     def __init__(
         self,
@@ -118,6 +119,9 @@ class RadiacodeBtDataUpdateCoordinator(DataUpdateCoordinator):
             )
             self.last_fw_version = await self.hass.async_add_executor_job(
                 self.api.fw_version
+            )
+            self.last_serial_number = await self.hass.async_add_executor_job(
+                self.api.serial_number
             )
 
         _LOGGER.info(f"Getting data from: {self.mac}")
