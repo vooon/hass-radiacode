@@ -10,6 +10,9 @@
 [![hacs][hacsbadge]][hacs]
 [![Project Maintenance][maintenance-shield]][user_profile]
 
+**DEPRECATED**: i cannot get it to stable. Replaced with MQTT publisher: https://github.com/cdump/radiacode/pull/6 .
+
+
 **This component will set up the following platforms.**
 
 | Platform | Description                                    |
